@@ -1,0 +1,152 @@
+================================================================================
+DOKUMENTASI LENGKAP SISTEM, ALUR KERJA, DAN RIWAYAT PENGERJAAN
+PROYEK: JOKEWARE / NUISANCEWARE (EXPERIMENTAL ANDROID APP)
+LOKASI PROYEK: C:\joke
+================================================================================
+
+--------------------------------------------------------------------------------
+1. PENDAHULUAN & KONSEP UTAMA
+--------------------------------------------------------------------------------
+Proyek ini adalah aplikasi Android eksperimental bertema Jokeware/Nuisanceware
+yang dikembangkan dengan bahasa Kotlin, Antigravity IDE, Gradle CLI, dan ADB.
+
+Prinsip Utama Aplikasi:
+- Invisible & Touch Pass-Through: Saat dibuka, aplikasi 100% transparan dan 
+  sentuhan layar tetap tembus ke aplikasi di belakangnya / Home screen.
+- Auto Launch Service: Aplikasi langsung menyalakan pemutar media di latar belakang 
+  dan menutup launcher activity tanpa meninggalkan kartu di Recent Apps.
+- Maximum Volume Enforcement: Volume media (STREAM_MUSIC) dinaikkan ke level maksimal 
+  dan dipantau secara berkala selama service aktif.
+- Background Media Looping: Memutar file audio kustom secara berulang-ulang (looping) 
+  melalui proses sistem yang terisolasi.
+- Safe Termination & Volume Recovery: Pengguna dapat menghentikan suara melalui tombol 
+  "Stop" pada notifikasi status bar, dan volume akan otomatis dipulihkan ke nilai semula.
+
+
+--------------------------------------------------------------------------------
+2. ARSITEKTUR & STRUKTUR KOMPONEN SISTEM
+--------------------------------------------------------------------------------
+Folder Utama: C:\joke\app\src\main\
+
+A. MainActivity (java/com/jokeware/nuisance/MainActivity.kt)
+   - Bertindak sebagai entry-point (Launcher Activity).
+   - Window Flags: Diberi flag FLAG_NOT_TOUCHABLE, FLAG_NOT_FOCUSABLE, dan 
+     FLAG_LAYOUT_NO_LIMITS agar sentuhan jari langsung tembus ke launcher sistem.
+   - Exclude From Recents: Dikonfigurasi android:excludeFromRecents="true".
+   - Lifecycle: Pada onCreate, ia langsung memanggil startForegroundService() untuk
+     menjalankan PrankAudioService, lalu mengeksekusi finishAndRemoveTask() sehingga 
+     tidak ada jendela yang menumpuk di Recent Apps.
+
+B. PrankAudioService (java/com/jokeware/nuisance/PrankAudioService.kt)
+   - Berjalan pada proses sistem terpisah: android:process=":prank_service".
+   - Memiliki atribut android:stopWithTask="false" dan handler onTaskRemoved() agar 
+     proses service tetap hidup meskipun task manager / recent apps dibersihkan.
+   - Menerapkan standar Foreground Service resmi Android 10+ (API 29+) dengan 
+     Notification Channel ("Media Playback Service") dan tombol aksi "Stop".
+   - Mengontrol siklus hidup pemutaran audio (MediaPlayer) dan volume.
+
+C. VolumeController (java/com/jokeware/nuisance/VolumeController.kt)
+   - captureOriginalVolume(): Menyimpan tingkat volume media awal sebelum diubah.
+   - maximizeMediaVolume(): Memaksimalkan volume media (STREAM_MUSIC).
+   - restoreVolume(): Mengembalikan tingkat volume media ke kondisi awal saat 
+     aplikasi dihentikan.
+
+D. Resources & Assets (res/)
+   - res/drawable/app_icon.png: File gambar ikon aplikasi.
+   - res/raw/prank_audio.mp3: File audio kustom yang diputar berulang.
+   - res/values/strings.xml: Nama aplikasi yang tampil di perangkat ("System Tool").
+   - res/values/themes.xml: Definisi tema transparan tanpa batas layout & tanpa dimming.
+
+
+--------------------------------------------------------------------------------
+3. ALUR KERJA SISTEM (RUNTIME LIFECYCLE)
+--------------------------------------------------------------------------------
+
+[ USER MEMBUKA APLIKASI ]
+         │
+         ▼
+[ MainActivity Aktif ]
+   - Mengaktifkan jendela 100% transparan + touch pass-through.
+   - Memanggil ContextCompat.startForegroundService().
+   - Memanggil finishAndRemoveTask() untuk menutup launcher dirinya secara mulus.
+         │
+         ▼
+[ PrankAudioService Berjalan di Proses :prank_service ]
+   - Mendaftarkan Notification Channel & Menampilkan notifikasi Foreground Service.
+   - VolumeController mencatat volume media awal (captureOriginalVolume).
+   - VolumeController menaikkan volume media ke batas maksimal 100%.
+   - Memulai pemutaran audio looping (prank_audio.mp3).
+   - Menjalankan coroutine loop berkala untuk menjaga volume tetap maksimal.
+         │
+         ▼
+[ USER BERINTERAKSI DENGAN PERANGKAT ]
+   - Pengguna kembali ke Home / aplikasi lain dan dapat menyentuh layar secara normal.
+   - Suara tetap berjalan di latar belakang tanpa henti.
+   - Menutup / membersihkan Recent Apps tidak menghentikan suara (karena beda proses).
+         │
+         ▼
+[ PENGHENTIAN & PEMULIHAN (TERMINATION) ]
+   - Pengguna menekan tombol "Stop" di panel notifikasi (atau Force Stop di Settings/ADB).
+   - Service menerima ACTION_STOP -> Menghentikan pemutaran MediaPlayer.
+   - VolumeController mengembalikan volume media ke nilai awal pengguna.
+   - Foreground notification dihapus dan service memanggil stopSelf().
+
+
+--------------------------------------------------------------------------------
+4. RIWAYAT PENGERJAAN & SOLUSI TEKNIS (DEVELOPMENT LOG)
+--------------------------------------------------------------------------------
+
+1. Setup Toolchain & Environment:
+   - Mengonfigurasi JDK 17 (Eclipse Temurin) dan menambahkan JAVA_HOME ke sistem.
+   - Mengunduh Android Command-line Tools resmi, lisensi SDK, serta menginstal 
+     Android SDK Platform 34 dan Build-Tools 34.0.0.
+   - Mengunduh dan menempatkan binary resmi gradle-wrapper.jar (Gradle 8.7).
+
+2. Implementasi Touch Pass-Through & Transparansi:
+   - Mengatasi kendala sentuhan yang tertahan dengan menambahkan flag 
+     FLAG_NOT_TOUCHABLE dan FLAG_NOT_FOCUSABLE pada Window MainActivity.
+
+3. Transisi ke Arsitektur Foreground Service:
+   - Memindahkan pemutaran audio dari Activity ke Service agar audio tidak mati saat 
+     pengguna berpindah aplikasi.
+   - Menambahkan Notification Channel dan aksi kontrol Stop sesuai kebijakan Android.
+
+4. Mengatasi Masalah Suara Berhenti saat Di-Swipe dari Recent Apps:
+   - Kendala: Aksi swipe task di Android mematikan proses utama aplikasi secara default.
+   - Solusi: Menambahkan android:process=":prank_service" agar Service berjalan pada 
+     proses independen, menambahkan android:stopWithTask="false", dan memanggil 
+     finishAndRemoveTask() pada MainActivity.
+
+5. Perbaikan Inisialisasi MediaPlayer (Custom Audio):
+   - Kendala: Pemanggilan setAudioAttributes() setelah MediaPlayer.create() menyebabkan 
+     IllegalStateException pada Android.
+   - Solusi: Menyederhanakan inisialisasi MediaPlayer dengan setVolume(1.0f, 1.0f) dan 
+     isLooping = true langsung setelah pembuatan instance.
+
+6. Integrasi Aset Gambar & Suara Kustom:
+   - Memasang app_icon.png ke res/drawable/ dan mendaftarkannya di AndroidManifest.
+   - Memasang prank_audio.mp3 ke res/raw/ dan menghubungkannya dengan MediaPlayer.
+
+
+--------------------------------------------------------------------------------
+5. CHEAT-SHEET PERINTAH TERMINAL (OPERASIONAL)
+--------------------------------------------------------------------------------
+
+A. Inisialisasi Path Environment (di PowerShell):
+   $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-17.0.20.101-hotspot"
+   $env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
+   $env:Path = "$env:JAVA_HOME\bin;$env:ANDROID_HOME\platform-tools;$env:Path"
+
+B. Melakukan Kompilasi / Build APK:
+   cd C:\joke
+   .\gradlew.bat assembleDebug
+
+C. Memasang / Install APK ke Perangkat Android:
+   adb install -r C:\joke\app\build\outputs\apk\debug\app-debug.apk
+
+D. Menghentikan Aplikasi secara Paksa (Pengujian):
+   adb shell am force-stop com.jokeware.nuisance
+
+E. Memantau Log Realtime (Debugging):
+   adb logcat -s MainActivity VolumeController PrankAudioService
+================================================================================

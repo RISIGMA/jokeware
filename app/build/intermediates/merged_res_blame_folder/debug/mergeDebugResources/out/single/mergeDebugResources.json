@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.jokeware.nuisance.app-debug-23:/raw_prank_audio.mp3.flat",
+        "source": "com.jokeware.nuisance.app-main-25:/raw/prank_audio.mp3"
+    },
+    {
+        "merged": "com.jokeware.nuisance.app-debug-23:/drawable_app_icon.png.flat",
+        "source": "com.jokeware.nuisance.app-main-25:/drawable/app_icon.png"
+    }
+]

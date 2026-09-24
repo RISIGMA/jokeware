@@ -1,0 +1,137 @@
+Gunakan dokumentasi proyek yang sudah ada sebagai baseline. Jangan mengubah arsitektur, fitur, nama class, package, audio, mekanisme volume, atau workflow yang sudah berhasil.
+
+## FITUR YANG SUDAH ADA — JANGAN DIUBAH
+
+Project berada di:
+
+C:\joke
+
+Package:
+
+com.jokeware.nuisance
+
+Komponen utama:
+
+* MainActivity
+* PrankAudioService
+* VolumeController
+* Foreground Service
+* MediaPlayer looping
+* Volume capture / maximum / restore
+* `finishAndRemoveTask()`
+* `android:excludeFromRecents="true"`
+* proses service terpisah `:prank_service`
+
+Pertahankan seluruh perilaku tersebut.
+
+## FITUR TAMBAHAN YANG DIBUTUHKAN
+
+Selesaikan lifecycle aplikasi setelah launcher activity dijalankan.
+
+Alur yang diinginkan:
+
+Launcher
+↓
+MainActivity dibuka
+↓
+MainActivity menjalankan inisialisasi
+↓
+PrankAudioService dimulai
+↓
+Service berhasil menjadi Foreground Service
+↓
+MainActivity ditutup
+↓
+Task aplikasi tidak muncul di Recent Apps
+↓
+PrankAudioService tetap berjalan
+↓
+Pengguna dapat menggunakan perangkat seperti biasa
+
+Gunakan mekanisme Android resmi dan terdokumentasi.
+
+## PENTING
+
+Jangan:
+
+* menghapus package aplikasi;
+* meng-uninstall aplikasi;
+* menggunakan root;
+* menggunakan Accessibility Service untuk persistence;
+* mencegah Force Stop;
+* menggunakan exploit Android;
+* menyamarkan service sebagai komponen sistem;
+* menyembunyikan aktivitas aplikasi dari pengguna secara diam-diam.
+
+Aplikasi harus tetap dapat ditemukan dan dikelola melalui Settings → Apps.
+
+## PERILAKU FORCE STOP
+
+Pastikan:
+
+Settings
+→ Apps
+→ com.jokeware.nuisance
+→ Force Stop
+
+benar-benar menghentikan seluruh proses aplikasi dan Foreground Service.
+
+Jangan membuat mekanisme restart otomatis yang mencoba melawan Force Stop.
+
+## FOREGROUND SERVICE
+
+Pertahankan:
+
+* Notification Channel.
+* Foreground notification.
+* Tombol `Stop`.
+* ACTION_STOP.
+* Pemulihan volume menggunakan `restoreVolume()`.
+* `stopSelf()` setelah proses dihentikan.
+
+Pastikan notification tetap menjadi indikator bahwa service sedang aktif.
+
+## VALIDASI
+
+Setelah implementasi selesai, lakukan:
+
+1. Build:
+
+cd C:\joke
+.\gradlew.bat assembleDebug
+
+2. Install:
+
+adb install -r C:\joke\app\build\outputs\apk\debug\app-debug.apk
+
+3. Jalankan aplikasi dari launcher.
+
+4. Pastikan:
+
+   * MainActivity menutup setelah service berhasil dimulai.
+   * Aplikasi tidak meninggalkan task di Recent Apps.
+   * Audio tetap looping.
+   * Volume tetap mengikuti mekanisme yang sudah dibuat.
+   * Notification Foreground Service muncul.
+   * Tombol Stop bekerja.
+   * Force Stop dari Settings/ADB menghentikan aplikasi.
+
+5. Debug dengan:
+
+adb logcat -s MainActivity VolumeController PrankAudioService
+
+## OUTPUT
+
+Jangan membuat ulang project dari awal.
+
+Berikan hanya perubahan yang diperlukan terhadap project existing:
+
+* file yang perlu diedit;
+* perubahan `AndroidManifest.xml`;
+* perubahan `MainActivity.kt`;
+* perubahan `PrankAudioService.kt` jika diperlukan;
+* konfigurasi Gradle jika diperlukan;
+* command build dan install;
+* langkah pengujian.
+
+Jaga kompatibilitas dengan Android SDK yang saat ini digunakan project.

@@ -1,0 +1,72 @@
+================================================================================
+PROMPT KELANJUTAN PROYEK (PROJECT RESUME PROMPT)
+================================================================================
+Anda dapat langsung menyalin (copy-paste) seluruh teks di bawah ini ke sesi AI baru 
+apabila ingin melanjutkan pengembangan proyek ini di kemudian hari.
+================================================================================
+
+Halo Antigravity, saya sedang mengembangkan proyek aplikasi Android "Jokeware / Nuisanceware" 
+yang berlokasi di direktori: C:\joke
+
+Berikut adalah ringkasan arsitektur, konfigurasi lingkungan, dan status terakhir proyek:
+
+---
+1. SPESIFIKASI & ENVIRONMENT
+---
+- Bahasa: Kotlin
+- Build System: Gradle CLI (Gradle 8.7, Android Gradle Plugin 8.5.2)
+- JDK Path: C:\Program Files\Eclipse Adoptium\jdk-17.0.20.101-hotspot
+- Android SDK Path: C:\Users\User\AppData\Local\Android\Sdk (Compile SDK 34, Min SDK 24)
+- Target Package: com.jokeware.nuisance
+- Lokasi Output APK: C:\joke\app\build\outputs\apk\debug\app-debug.apk
+
+---
+2. ARSITEKTUR & BEHAVIOR SISTEM SAAT INI
+---
+A. MainActivity (app/src/main/java/com/jokeware/nuisance/MainActivity.kt):
+   - 100% transparan secara visual (Theme.JokeApp).
+   - Menggunakan window flags FLAG_NOT_TOUCHABLE dan FLAG_NOT_FOCUSABLE (Touch Pass-Through / Click-Through), sehingga layar tetap dapat disentuh normal oleh pengguna.
+   - Menggunakan android:excludeFromRecents="true".
+   - Begitu dibuka, MainActivity langsung menyalakan PrankAudioService dan memanggil finishAndRemoveTask(), sehingga tidak ada kartu aplikasi yang tertinggal di menu Recent Apps.
+
+B. PrankAudioService (app/src/main/java/com/jokeware/nuisance/PrankAudioService.kt):
+   - Berjalan pada proses terisolasi terpisah: android:process=":prank_service" dengan stopWithTask="false".
+   - Menggunakan arsitektur Foreground Service resmi Android dengan Notification Channel ("Media Playback Service") dan tombol aksi "Stop".
+   - Memutar file audio kustom dari res/raw/prank_audio.mp3 secara looping terus-menerus (isLooping = true) dengan fallback ke ToneGenerator jika file tidak ada.
+   - Suara tetap berjalan stabil di latar belakang meskipun aplikasi di-minimize atau di-swipe dari Recent Apps.
+
+C. VolumeController (app/src/main/java/com/jokeware/nuisance/VolumeController.kt):
+   - Menangkap nilai volume media (STREAM_MUSIC) awal.
+   - Memaksimalkan volume media ke level tertinggi selama service aktif.
+   - Memulihkan volume ke level awal saat service dihentikan melalui tombol notifikasi atau onDestroy.
+
+D. Resources & Aset:
+   - Ikon Aplikasi: app/src/main/res/drawable/app_icon.png (didaftarkan di AndroidManifest.xml).
+   - Audio: app/src/main/res/raw/prank_audio.mp3.
+   - Nama Aplikasi: app/src/main/res/values/strings.xml.
+
+---
+3. WORKFLOW TERMINAL & COMMANDS
+---
+Set Environment Variables:
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-17.0.20.101-hotspot"
+$env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
+$env:Path = "$env:JAVA_HOME\bin;$env:ANDROID_HOME\platform-tools;$env:Path"
+
+Build APK:
+.\gradlew.bat assembleDebug
+
+Install ke Perangkat Android:
+adb install -r C:\joke\app\build\outputs\apk\debug\app-debug.apk
+
+Hentikan Aplikasi (Testing):
+adb shell am force-stop com.jokeware.nuisance
+(atau klik tombol "Stop" pada notifikasi status bar di HP)
+
+Monitoring Logcat:
+adb logcat -s MainActivity VolumeController PrankAudioService
+
+---
+4. PERMINTAAN SAYA SAAT INI:
+---
+[Tuliskan fitur tambahan, modifikasi, atau pertanyaan yang ingin Anda lanjutkan di sini]

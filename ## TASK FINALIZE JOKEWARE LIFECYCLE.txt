@@ -1,0 +1,133 @@
+## TASK: FINALIZE JOKEWARE LIFECYCLE — DO NOT REDESIGN
+
+Project Android berada di:
+
+`C:\joke`
+
+Development environment:
+
+* Antigravity IDE
+* Kotlin
+* Gradle CLI
+* ADB
+* **Jangan gunakan Android Studio**
+
+### KONDISI PROJECT SAAT INI
+
+Fitur berikut SUDAH BERHASIL dan WAJIB dipertahankan:
+
+1. `MainActivity` transparan.
+2. Window tidak menerima touch sehingga aplikasi tetap dapat digunakan untuk interaksi layar normal.
+3. `MainActivity` menjalankan `PrankAudioService` menggunakan `startForegroundService()`.
+4. `MainActivity` kemudian menjalankan `finishAndRemoveTask()`.
+5. Aplikasi tidak muncul sebagai kartu di Recent Apps.
+6. `PrankAudioService` berjalan sebagai Foreground Service.
+7. Service berada pada process terpisah `:prank_service`.
+8. `stopWithTask="false"`.
+9. Audio dapat looping.
+10. Volume dapat dinaikkan ke maksimum dan nilai awal dapat dipulihkan.
+11. Notification Foreground Service memiliki action untuk menghentikan service.
+12. Force Stop melalui Settings/ADB dapat menghentikan aplikasi.
+13. Build menggunakan Gradle CLI dan saat ini berhasil `BUILD SUCCESSFUL`.
+
+### TUJUAN
+
+Jangan membuat ulang aplikasi.
+
+Jangan melakukan redesign arsitektur.
+
+Jangan mengubah mekanisme audio, volume controller, notification, service process, atau lifecycle yang sudah bekerja.
+
+Fokus hanya pada pemeriksaan dan penyempurnaan lifecycle aplikasi agar perilakunya konsisten dengan dokumentasi project.
+
+### ATURAN PENTING
+
+Sebelum mengubah kode:
+
+1. Inspect seluruh project `C:\joke`.
+2. Baca:
+
+   * `AndroidManifest.xml`
+   * `MainActivity`
+   * `PrankAudioService`
+   * `VolumeController`
+   * resource notification
+   * Gradle configuration
+3. Identifikasi bagian yang sudah memenuhi requirement.
+4. Jangan mengubah bagian yang sudah benar.
+5. Jangan menambahkan dependency yang tidak diperlukan.
+6. Jangan menggunakan Android Studio.
+7. Gunakan Gradle CLI untuk build.
+8. Gunakan ADB untuk instalasi dan pengujian.
+
+### LAUNCHER / VISIBILITY REQUIREMENT
+
+Periksa konfigurasi launcher application.
+
+Bedakan dengan jelas antara:
+
+* menghapus Activity dari Recent Apps;
+* menutup Activity;
+* aplikasi tetap terpasang;
+* aplikasi tetap dapat ditemukan dan dihentikan melalui mekanisme sistem;
+* dan perubahan visibility launcher.
+
+`finishAndRemoveTask()` **tidak boleh dianggap sebagai fitur hide launcher**.
+
+Jika requirement visibility launcher belum dapat dipenuhi tanpa membuat aplikasi menjadi sulit ditemukan/dihentikan pengguna, **jangan mengimplementasikan mekanisme stealth persistence**.
+
+Pertahankan aplikasi tetap dapat dikelola melalui Android Settings dan mekanisme sistem.
+
+### VALIDATION
+
+Setelah pemeriksaan/perubahan:
+
+Build:
+
+`cd C:\joke`
+
+`.\gradlew.bat assembleDebug`
+
+Jika build berhasil, install:
+
+`adb install -r C:\joke\app\build\outputs\apk\debug\app-debug.apk`
+
+Kemudian lakukan pengujian:
+
+1. Launch aplikasi.
+2. Pastikan Activity transparan.
+3. Pastikan touch pada aplikasi lain tetap berfungsi.
+4. Pastikan Foreground Service berjalan.
+5. Pastikan audio berjalan.
+6. Pastikan volume controller bekerja.
+7. Pastikan aplikasi tidak muncul sebagai Recent Apps task.
+8. Pastikan notification service tersedia.
+9. Tekan Stop pada notification.
+10. Pastikan audio berhenti.
+11. Pastikan volume dikembalikan.
+12. Uji Force Stop melalui ADB.
+13. Pastikan service benar-benar berhenti.
+
+Gunakan:
+
+`adb shell am force-stop com.jokeware.nuisance`
+
+Kemudian cek log:
+
+`adb logcat -s MainActivity VolumeController PrankAudioService`
+
+### OUTPUT YANG WAJIB DIBERIKAN
+
+Setelah selesai, berikan laporan:
+
+* File yang diperiksa.
+* File yang diubah, jika ada.
+* Perubahan yang dilakukan.
+* Fitur yang berhasil divalidasi.
+* Fitur yang belum tersedia.
+* Hasil `assembleDebug`.
+* Hasil pengujian ADB.
+* Jangan menyatakan fitur “hide launcher” berhasil jika memang belum ada.
+* Bedakan secara eksplisit antara **Recent Apps removal** dan **launcher visibility**.
+
+Jangan mengklaim sesuatu berhasil hanya berdasarkan asumsi. Hanya nyatakan berhasil jika benar-benar diverifikasi.

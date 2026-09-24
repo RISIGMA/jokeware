@@ -1,0 +1,720 @@
+Saya ingin mengembangkan sebuah aplikasi Android eksperimental bertema **jokeware / nuisanceware** menggunakan **Antigravity IDE** sebagai lingkungan pengembangan utama dan **terminal dengan Gradle CLI** untuk proses build, install, dan debugging.
+
+Jangan menggunakan Android Studio sebagai IDE atau bagian dari workflow pengembangan.
+
+---
+
+# 1. ENVIRONMENT PENGEMBANGAN
+
+Gunakan environment berikut:
+
+* **IDE:** Antigravity IDE
+* **Bahasa:** Kotlin
+* **Build system:** Gradle
+* **Build interface:** Gradle CLI melalui terminal
+* **Android SDK:** digunakan sebagai Android toolchain
+* **JDK:** gunakan versi yang kompatibel dengan Android Gradle Plugin
+* **ADB:** digunakan untuk komunikasi dengan perangkat Android/emulator
+* **Git:** opsional untuk version control
+
+Workflow utama:
+
+```text
+Antigravity IDE
+        ↓
+Edit source code
+        ↓
+Terminal
+        ↓
+Gradle CLI
+        ↓
+Build APK
+        ↓
+ADB
+        ↓
+Install ke perangkat Android
+        ↓
+Testing
+```
+
+Jangan memberikan instruksi yang mengharuskan membuka Android Studio.
+
+---
+
+# 2. KONSEP APLIKASI
+
+Saya sedang membuat aplikasi eksperimental bertema:
+
+**Jokeware / Nuisanceware**
+
+Tujuan aplikasi bukan mencuri data atau merusak sistem.
+
+Aplikasi berfokus pada efek prank yang mengganggu pengguna melalui perilaku audio/volume.
+
+Tidak boleh ada:
+
+* pencurian data;
+* credential stealing;
+* keylogging;
+* penghapusan file;
+* modifikasi file pengguna;
+* ransomware;
+* enkripsi data;
+* spyware;
+* pengiriman data ke server;
+* persistence tersembunyi;
+* privilege escalation;
+* exploit;
+* root;
+* atau mekanisme untuk mengambil alih seluruh perangkat.
+
+---
+
+# 3. KONSEP UTAMA APLIKASI
+
+Ketika user membuka aplikasi:
+
+```text
+OPEN APPLICATION
+        ↓
+Activity berjalan
+        ↓
+UI benar-benar transparan
+        ↓
+Tidak ada elemen UI yang terlihat
+        ↓
+Volume media diarahkan ke maksimum
+        ↓
+Efek prank aktif
+```
+
+Aplikasi harus terasa seperti:
+
+> "Tidak ada apa-apa di layar."
+
+Bukan sekadar tampilan minimal.
+
+Background Activity harus benar-benar transparan sehingga konten di belakang Activity tetap terlihat.
+
+---
+
+# 4. USER INTERFACE
+
+Activity harus menggunakan **100% transparent window**.
+
+Jangan menggunakan:
+
+* background hitam;
+* background putih;
+* semi-transparent overlay;
+* blur;
+* gradient;
+* card;
+* toolbar;
+* splash screen yang terlihat;
+* teks;
+* logo;
+* tombol;
+* menu;
+* dialog;
+* atau elemen visual lainnya.
+
+Saat aplikasi aktif, user harus hampir tidak menyadari bahwa sebuah Activity sedang berjalan.
+
+Tidak boleh ada:
+
+```text
+STOP PRANK
+EXIT
+CLOSE
+CANCEL
+```
+
+atau tombol penghentian di dalam UI.
+
+---
+
+# 5. PERILAKU SAAT APLIKASI DIBUKA
+
+Saat Activity pertama kali dibuat:
+
+1. Simpan nilai volume media saat ini.
+2. Inisialisasi controller prank.
+3. Naikkan volume media ke level maksimum yang diperbolehkan Android.
+4. Jalankan efek audio jika diperlukan.
+5. Jangan meminta akses terhadap data pengguna.
+6. Jangan melakukan network request.
+7. Jangan menjalankan proses persistence.
+
+Fokus hanya pada:
+
+**Media Volume**
+
+Jangan mengubah:
+
+* ringtone volume;
+* notification volume;
+* alarm volume;
+
+kecuali memang diperlukan secara eksplisit oleh implementasi Android dan dijelaskan terlebih dahulu.
+
+---
+
+# 6. PERILAKU PERANGKAT
+
+Walaupun prank aktif, perangkat tetap harus dapat digunakan.
+
+User tetap dapat:
+
+* menggunakan touchscreen;
+* membuka aplikasi lain;
+* membuka Home;
+* membuka notification panel;
+* menggunakan Back;
+* mengunci layar;
+* melakukan aktivitas Android normal.
+
+Aplikasi tidak boleh:
+
+* mengunci touchscreen;
+* mengunci seluruh perangkat;
+* membuat kiosk mode;
+* mencegah user membuka aplikasi lain;
+* mencegah user melakukan restart;
+* mengambil alih seluruh sistem.
+
+---
+
+# 7. TOMBOL VOLUME
+
+Konsep prank yang diinginkan:
+
+> volume terlihat seperti terkunci pada level maksimum.
+
+Namun implementasikan hanya menggunakan kemampuan API Android yang tersedia untuk aplikasi biasa.
+
+Jangan melakukan bypass terhadap Android untuk benar-benar memblokir tombol volume.
+
+Jangan menggunakan:
+
+* Accessibility Service untuk mengambil alih tombol;
+* Device Administrator;
+* root;
+* exploit;
+* system privilege;
+* custom ROM;
+* input hijacking;
+* atau mekanisme lain untuk mengambil alih kontrol sistem.
+
+Jika Android tidak mengizinkan aplikasi biasa mempertahankan volume maksimum setelah user menekan tombol volume, jangan mencoba melewati pembatasan tersebut.
+
+Dalam kondisi tersebut, jelaskan keterbatasannya dan implementasikan simulasi yang paling dekat dengan konsep prank.
+
+---
+
+# 8. HOME / BACKGROUND BEHAVIOR
+
+Ketika user menekan Home dan Activity kehilangan foreground:
+
+* hentikan efek prank;
+* hentikan audio;
+* lakukan cleanup;
+* jangan menjalankan background persistence;
+* jangan auto-start kembali.
+
+Tidak boleh ada:
+
+```text
+BOOT COMPLETED
+AUTO START
+BACKGROUND SERVICE
+HIDDEN SERVICE
+SCHEDULED RESTART
+```
+
+Prank hanya aktif ketika user secara eksplisit membuka aplikasi.
+
+---
+
+# 9. RECOVERY VOLUME
+
+Bagian ini sangat penting.
+
+Sebelum prank dimulai:
+
+```text
+originalVolume = currentMediaVolume
+```
+
+Ketika prank aktif:
+
+```text
+currentMediaVolume → maximum
+```
+
+Ketika aplikasi berhenti:
+
+```text
+maximum → originalVolume
+```
+
+Contoh:
+
+```text
+Volume sebelum aplikasi:
+30%
+
+Aplikasi dibuka:
+30% → 100%
+
+Aplikasi ditutup:
+100% → 30%
+```
+
+Nilai volume awal hanya digunakan untuk recovery sesi tersebut.
+
+Jangan menyimpan konfigurasi volume secara permanen.
+
+---
+
+# 10. LIFECYCLE
+
+Gunakan Android Activity Lifecycle dengan benar.
+
+Handle minimal:
+
+```text
+onCreate()
+onStart()
+onResume()
+onPause()
+onStop()
+onDestroy()
+```
+
+Ketika Activity berhenti atau tidak lagi aktif, lakukan cleanup sesuai lifecycle.
+
+Cleanup harus:
+
+* menghentikan audio;
+* membatalkan coroutine/timer;
+* melepaskan resource;
+* menghentikan controller;
+* mengembalikan volume;
+* memastikan tidak ada task tersembunyi yang tetap berjalan.
+
+Hindari logic yang dapat menyebabkan:
+
+```text
+Activity → Service → Activity → Service → ...
+```
+
+atau loop background.
+
+---
+
+# 11. AUDIO
+
+Jika aplikasi menggunakan efek suara:
+
+* audio harus berasal dari resource aplikasi;
+* jangan menggunakan microphone;
+* jangan melakukan recording;
+* jangan membaca audio pribadi pengguna;
+* jangan melakukan streaming audio dari internet;
+* hentikan audio ketika prank berhenti.
+
+Gunakan audio player Android yang sesuai.
+
+---
+
+# 12. PERMISSION
+
+Gunakan permission seminimal mungkin.
+
+Jangan meminta:
+
+```text
+READ_EXTERNAL_STORAGE
+READ_MEDIA_*
+CAMERA
+RECORD_AUDIO
+ACCESS_FINE_LOCATION
+ACCESS_COARSE_LOCATION
+READ_CONTACTS
+READ_SMS
+CALL_PHONE
+QUERY_ALL_PACKAGES
+BIND_ACCESSIBILITY_SERVICE
+```
+
+atau permission lain yang tidak diperlukan.
+
+Jika kontrol media volume tidak membutuhkan permission khusus pada target Android yang digunakan, jangan menambahkan permission tersebut.
+
+---
+
+# 13. ARSITEKTUR PROJECT
+
+Gunakan struktur sederhana:
+
+```text
+project/
+│
+├── gradle/
+│   └── wrapper/
+│
+├── app/
+│   ├── build.gradle.kts
+│   │
+│   └── src/
+│       └── main/
+│           ├── AndroidManifest.xml
+│           │
+│           ├── java/
+│           │   └── [package]/
+│           │       ├── MainActivity.kt
+│           │       ├── PrankController.kt
+│           │       └── VolumeController.kt
+│           │
+│           └── res/
+│               ├── drawable/
+│               ├── mipmap/
+│               ├── values/
+│               │   ├── strings.xml
+│               │   ├── colors.xml
+│               │   └── themes.xml
+│               └── raw/
+│                   └── prank_audio.*
+│
+├── build.gradle.kts
+├── settings.gradle.kts
+├── gradle.properties
+├── gradlew
+└── gradlew.bat
+```
+
+Gunakan Kotlin DSL:
+
+```text
+build.gradle.kts
+settings.gradle.kts
+app/build.gradle.kts
+```
+
+Jangan menggunakan konfigurasi yang mengharuskan Android Studio.
+
+---
+
+# 14. KOMPONEN KODE
+
+## MainActivity.kt
+
+Bertanggung jawab terhadap:
+
+* Activity lifecycle;
+* transparent window;
+* inisialisasi controller;
+* memulai prank;
+* menghentikan prank;
+* cleanup.
+
+## VolumeController.kt
+
+Bertanggung jawab terhadap:
+
+* mendapatkan volume media;
+* menyimpan volume awal;
+* menaikkan volume;
+* recovery volume;
+* validasi kondisi AudioManager.
+
+## PrankController.kt
+
+Bertanggung jawab terhadap:
+
+* start prank;
+* stop prank;
+* audio;
+* koordinasi VolumeController;
+* cleanup.
+
+Pisahkan tanggung jawab antar-class agar project mudah dipelajari dan dikembangkan.
+
+---
+
+# 15. TRANSPARENT ACTIVITY
+
+Gunakan konfigurasi Android Theme/Window yang benar agar Activity benar-benar transparan.
+
+Target visual:
+
+```text
+┌───────────────────────────────┐
+│                               │
+│     HOME / APP DI BELAKANG    │
+│                               │
+│       TERLIHAT NORMAL         │
+│                               │
+└───────────────────────────────┘
+```
+
+Activity tidak boleh memberikan overlay visual yang terlihat.
+
+---
+
+# 16. NO PERSISTENCE
+
+Aplikasi hanya aktif setelah user membuka aplikasi.
+
+Jangan implementasikan:
+
+* `BOOT_COMPLETED`;
+* BroadcastReceiver untuk autostart;
+* foreground service yang tidak diperlukan;
+* background service;
+* WorkManager;
+* AlarmManager;
+* scheduled task;
+* auto restart;
+* startup persistence.
+
+Setelah Activity berhenti, prank selesai.
+
+---
+
+# 17. GRADLE CLI WORKFLOW
+
+Seluruh proses build dilakukan melalui terminal.
+
+Untuk Windows:
+
+```powershell
+.\gradlew.bat assembleDebug
+```
+
+Untuk sistem Unix:
+
+```bash
+./gradlew assembleDebug
+```
+
+Jika berhasil, APK berada di:
+
+```text
+app/build/outputs/apk/debug/app-debug.apk
+```
+
+Untuk membersihkan project:
+
+```powershell
+.\gradlew.bat clean
+```
+
+Untuk build dengan informasi error:
+
+```powershell
+.\gradlew.bat assembleDebug --stacktrace
+```
+
+Untuk mengecek task Gradle:
+
+```powershell
+.\gradlew.bat tasks
+```
+
+---
+
+# 18. ADB DEPLOYMENT
+
+Gunakan ADB dari terminal.
+
+Periksa perangkat:
+
+```powershell
+adb devices
+```
+
+Install APK:
+
+```powershell
+adb install -r app\build\outputs\apk\debug\app-debug.apk
+```
+
+Jika ingin uninstall:
+
+```powershell
+adb uninstall [package-name]
+```
+
+Jangan mengasumsikan Android Studio tersedia.
+
+---
+
+# 19. DEBUGGING
+
+Jika build gagal:
+
+1. baca error Gradle;
+2. identifikasi file dan line yang bermasalah;
+3. perbaiki source;
+4. jalankan kembali:
+
+```powershell
+.\gradlew.bat assembleDebug --stacktrace
+```
+
+Jika APK berhasil tetapi aplikasi crash:
+
+gunakan:
+
+```powershell
+adb logcat
+```
+
+atau filter package/application yang relevan.
+
+Jangan memberikan solusi yang hanya mengatakan:
+
+> "Buka project di Android Studio."
+
+Semua troubleshooting harus dapat dilakukan dari:
+
+**Antigravity IDE + Terminal + Gradle CLI + ADB.**
+
+---
+
+# 20. TOOLCHAIN
+
+Sebelum build, periksa:
+
+```powershell
+java -version
+```
+
+dan:
+
+```powershell
+adb version
+```
+
+Pastikan Android SDK dan build tools yang diperlukan tersedia.
+
+Gunakan Android Gradle Plugin dan Gradle wrapper yang kompatibel dengan JDK yang dipilih.
+
+Jangan mengandalkan instalasi Gradle global jika Gradle Wrapper tersedia.
+
+Prioritaskan:
+
+```text
+gradlew / gradlew.bat
+```
+
+agar versi Gradle project konsisten.
+
+---
+
+# 21. OUTPUT YANG SAYA INGINKAN
+
+Berikan project yang dapat langsung saya buka sebagai folder project di **Antigravity IDE**.
+
+Output harus mencakup:
+
+1. Struktur folder lengkap.
+2. `settings.gradle.kts`.
+3. `build.gradle.kts`.
+4. `app/build.gradle.kts`.
+5. `gradle.properties`.
+6. Gradle Wrapper.
+7. `AndroidManifest.xml`.
+8. `MainActivity.kt`.
+9. `PrankController.kt`.
+10. `VolumeController.kt`.
+11. `themes.xml`.
+12. `colors.xml`.
+13. `strings.xml`.
+14. resource audio jika diperlukan.
+15. seluruh dependency yang diperlukan.
+16. instruksi setup JDK.
+17. instruksi setup Android SDK.
+18. instruksi build menggunakan Gradle CLI.
+19. instruksi install menggunakan ADB.
+20. instruksi debugging menggunakan ADB/logcat.
+21. penjelasan lifecycle.
+22. penjelasan recovery volume.
+
+---
+
+# 22. WORKFLOW FINAL
+
+Target workflow:
+
+```text
+ANTIGRAVITY IDE
+      │
+      ├── Edit Kotlin
+      ├── Edit XML/resources
+      └── Edit Gradle
+              │
+              ▼
+          TERMINAL
+              │
+              ▼
+      gradlew assembleDebug
+              │
+              ▼
+             APK
+              │
+              ▼
+        adb install -r
+              │
+              ▼
+        ANDROID DEVICE
+              │
+              ▼
+        TEST APPLICATION
+```
+
+Tidak menggunakan Android Studio dalam workflow.
+
+---
+
+# 23. HASIL PERILAKU YANG DIHARAPKAN
+
+Ketika user membuka aplikasi:
+
+```text
+OPEN
+ ↓
+Transparent Activity
+ ↓
+Tidak ada UI terlihat
+ ↓
+Simpan volume awal
+ ↓
+Volume media → maksimum
+ ↓
+Prank aktif
+```
+
+Ketika user menekan Home / meninggalkan Activity:
+
+```text
+LEAVE ACTIVITY
+ ↓
+Prank berhenti
+ ↓
+Audio berhenti
+ ↓
+Cleanup
+ ↓
+Volume → nilai sebelumnya
+ ↓
+Tidak ada background persistence
+```
+
+Prinsip utama aplikasi:
+
+**Invisible UI + volume prank + normal device usability + lifecycle-based recovery**
+
+Bangun project dengan kode yang sederhana, modular, dapat dikompilasi melalui Gradle CLI, dan dapat dideploy menggunakan ADB dari terminal.
