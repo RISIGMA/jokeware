@@ -1,10 +1,18 @@
 [
     {
-        "merged": "com.jokeware.nuisance.app-debug-23:/raw_prank_audio.mp3.flat",
-        "source": "com.jokeware.nuisance.app-main-25:/raw/prank_audio.mp3"
+        "merged": "C:\\Users\\User\\.gradle\\daemon\\8.7\\com.jokeware.nuisance.app-debug-23:\\raw_prank_audio.mp3.flat",
+        "source": "C:\\Users\\User\\.gradle\\daemon\\8.7\\com.jokeware.nuisance.app-main-25:\\raw\\prank_audio.mp3"
     },
     {
-        "merged": "com.jokeware.nuisance.app-debug-23:/drawable_app_icon.png.flat",
-        "source": "com.jokeware.nuisance.app-main-25:/drawable/app_icon.png"
+        "merged": "C:\\Users\\User\\.gradle\\daemon\\8.7\\com.jokeware.nuisance.app-debug-23:\\layout_activity_main.xml.flat",
+        "source": "C:\\Users\\User\\.gradle\\daemon\\8.7\\com.jokeware.nuisance.app-main-25:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\User\\.gradle\\daemon\\8.7\\com.jokeware.nuisance.app-debug-23:\\drawable_app_icon.png.flat",
+        "source": "C:\\Users\\User\\.gradle\\daemon\\8.7\\com.jokeware.nuisance.app-main-25:\\drawable\\app_icon.png"
+    },
+    {
+        "merged": "com.jokeware.nuisance.app-debug-23:/layout_activity_main.xml.flat",
+        "source": "com.jokeware.nuisance.app-main-25:/layout/activity_main.xml"
     }
 ]

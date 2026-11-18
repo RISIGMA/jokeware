@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Fake Critical System Alert Dialog Card (Melayang di atas layar transparan) -->
+    <LinearLayout
+        android:id="@+id/dialogCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:padding="22dp"
+        android:elevation="12dp">
+
+        <TextView
+            android:id="@+id/tvDialogTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="System UI isn't responding"
+            android:textColor="#212121"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:id="@+id/tvDialogMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Do you want to close it?"
+            android:textColor="#616161"
+            android:textSize="14sp"
+            android:lineSpacingExtra="3dp"
+            android:layout_marginBottom="24dp" />
+
+        <LinearLayout
+            android:id="@+id/buttonContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/btnWait"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wait"
+                android:textColor="#1A73E8"
+                android:textStyle="bold"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnCloseApp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Close app"
+                android:textColor="#1A73E8"
+                android:textStyle="bold"
+                style="?android:attr/borderlessButtonStyle" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

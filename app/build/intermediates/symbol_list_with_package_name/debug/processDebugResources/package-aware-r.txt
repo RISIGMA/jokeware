@@ -706,6 +706,9 @@ id async
 id beginning
 id blocking
 id bottom
+id btnCloseApp
+id btnWait
+id buttonContainer
 id buttonPanel
 id center_vertical
 id checkbox
@@ -718,6 +721,7 @@ id custom
 id customPanel
 id decor_content_parent
 id default_activity_button
+id dialogCard
 id dialog_button
 id disableHome
 id edit_query
@@ -759,6 +763,7 @@ id radio
 id report_drawn
 id right_icon
 id right_side
+id rootContainer
 id screen
 id scrollIndicatorDown
 id scrollIndicatorUp
@@ -810,6 +815,8 @@ id titleDividerNoCustom
 id title_template
 id top
 id topPanel
+id tvDialogMessage
+id tvDialogTitle
 id unchecked
 id uniform
 id up
@@ -861,6 +868,7 @@ layout abc_search_dropdown_item_icons_2line
 layout abc_search_view
 layout abc_select_dialog_material
 layout abc_tooltip
+layout activity_main
 layout custom_dialog
 layout ime_base_split_test_activity
 layout ime_secondary_split_test_activity
